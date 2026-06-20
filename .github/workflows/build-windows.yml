@@ -23,23 +23,31 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'pnpm' # Ενεργοποίηση cache για το pnpm
+          cache: 'pnpm'
 
       - name: Εγκατάσταση Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-pc-windows-msvc # Ορίζουμε ρητά το target των Windows
+          targets: x86_64-pc-windows-msvc
 
       - name: Cache Rust dependencies
         uses: swatinem/rust-cache@v2
         with:
           workspaces: "./src-tauri -> target"
 
+      # --- Η ΝΕΑ ΠΡΟΣΘΗΚΗ ΠΟΥ ΛΥΝΕΙ ΤΟ ΠΡΟΒΛΗΜΑ ΟΡΙΣΤΙΚΑ ---
+      - name: Εγκατάσταση SQLite μέσω vcpkg
+        run: |
+          vcpkg install sqlite3:x64-windows
+          echo "SQLITE3_LIB_DIR=C:\vcpkg\installed\x64-windows\lib" >> $GITHUB_ENV
+          echo "SQLITE3_INCLUDE_DIR=C:\vcpkg\installed\x64-windows\include" >> $GITHUB_ENV
+        shell: pwsh
+      # -----------------------------------------------------
+
       - name: Εγκατάσταση frontend dependencies
-        run: pnpm install --frozen-lockfile # Πιο ασφαλές για CI
+        run: pnpm install --frozen-lockfile
 
       - name: Build Tauri app (Windows)
-        # Το CI=false εμποδίζει το Tauri από το να κολλήσει περιμένοντας user input
         env:
           CI: false 
         run: pnpm tauri build
@@ -51,4 +59,4 @@ jobs:
           path: |
             src-tauri/target/release/bundle/msi/*.msi
             src-tauri/target/release/bundle/nsis/*.exe
-          if-no-files-found: error # Θα μας δείξει αμέσως αν τα αρχεία φτιάχτηκαν
+          if-no-files-found: error

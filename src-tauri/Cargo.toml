@@ -22,11 +22,8 @@ tauri = { version = "2", features = [] }
 tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+rusqlite = "0.40.1"
+rusqlite_migration = "2.6.0"
 tauri-plugin-dialog = "2.7.1"
 tauri-plugin-fs = "2"
-
-# Αυτά τα τρία μαζί λύνουν το πρόβλημα οριστικά στα Windows:
-rusqlite = { version = "0.40.1", features = ["bundled"] }
-rusqlite_migration = "2.6.0"
-libsqlite3-sys = { version = "*", features = ["bundled"] }
 
